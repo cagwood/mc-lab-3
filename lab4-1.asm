@@ -59,8 +59,8 @@ send:
 	sbi PORTB, 3
 
 	in r16, PINB
-	andi r16, 0b00100000
-	cpi r16, 0b00100000
+	andi r16, 0b01000000
+	cpi r16,  0b01000000
 	brne send
 
 	sbi DDRB, 0
