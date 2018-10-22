@@ -55,7 +55,18 @@ listen:
 	lsl r16
 	out PORTD, r16
 
-	
+	;; stop confirming request
+	cbi PORTB, 5
+
+waitrecv:
+	sbis PINB, 4
+	rjmp waitrecv
+
+waitrecv2:
+	sbic PINB, 4
+	rjmp waitrecv
+
+	rjmp start
 send:
 	sbi PORTB, 3
 
