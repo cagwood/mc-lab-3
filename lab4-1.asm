@@ -54,7 +54,8 @@ listen:
 	lsl r16
 	lsl r16
 	out PORTD, r16
-	;; FINISH
+
+	
 send:
 	sbi PORTB, 3
 
@@ -74,5 +75,35 @@ send:
 	sbi PORTB, 1
 	sbic PIND, 2
 	sbi PORTB, 2
+	cbi PORTB, 3
 
+	;; Wait for PBb6 to be zero
+send2:	
+	in r16, PINB
+	andi r16, 0b01000000
+	brne send2
+
+	cbi DDRB, 0
+	cbi DDRB, 1
+	cbi DDRB, 2
+
+	ldi r16, 255
+	ldi r17, 199
+	ldi r18, 200
+delay:
+	dec r16
+	nop
+	brne delay
+
+	ldi r16, 255
+	dec r17
+	brne delay
+
+	ldi r17, 199
+	dec r18
+	brne delay
+	
+	;; End wanting to send
+	cbi PORTB, 3
+	rjmp start
 .end
