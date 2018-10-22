@@ -66,10 +66,13 @@ send:
 	sbi DDRB, 0
 	sbi DDRB, 1
 	sbi DDRB, 2
-	in r16, PIND
-	andi r16, 0b00000111
-
+	
 	;; Write D inputs to B outputs
-	out PORTB, r16
-	;; 
+	sbic PIND, 0
+	sbi PORTB, 0
+	sbic PIND, 1
+	sbi PORTB, 1
+	sbic PIND, 2
+	sbi PORTB, 2
+
 .end
