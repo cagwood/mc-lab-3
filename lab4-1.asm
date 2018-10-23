@@ -1,3 +1,8 @@
+;;; Pin configurations:
+;;; D:7|6 5 4|   3    |2 1 0 |
+;;;   x| LED |Send bit|Number|
+;;; B:7|     6      |     5      |    4    |   3   |2 1 0 |
+;;;   x|Recv Confirm|Send Confirm|RQ Listen|Sending|Number|
 .global start
 .text
 	;; Port B: Communication (data and control)
@@ -26,26 +31,21 @@ start:
 
 loop1:
 	;; Listen if requested to recieve
-	in r16, PINB
-	andi r16, 0b00010000
-	cpi r16, 0b00010000
+	sbic PINB, 4
 	breq listen
 
-	;; Send if Port D bit 3 is high
-	in r16, PIND
-	andi r16, 0b00001000
-	cpi r16, 0b00001000
+	;; Send if D send bit is high
+	sbic PIND, 3
 	breq send
 	
 	rjmp loop1
-	
+
+;;; Listen State
 listen:
 	sbi PORTB, 5
-
-	in r16, PINB
-	andi r16, 0b00010000
-	cpi r16, 0b00010000
-	breq listen
+w_lstn_c:	
+	sbic PINB, 4
+	breq w_lstn_c
 
 	in r16, PINB
 	andi r16, 0b00000111
@@ -58,22 +58,22 @@ listen:
 	;; stop confirming request
 	cbi PORTB, 5
 
-waitrecv:
+w2_lstn_s:
 	sbis PINB, 4
-	rjmp waitrecv
-
-waitrecv2:
+	rjmp w2_lstn_s
+w2_lstn_c:
 	sbic PINB, 4
-	rjmp waitrecv
+	rjmp w2_lstn_c
 
 	rjmp start
+
+;;; Send State
 send:
 	sbi PORTB, 3
 
-	in r16, PINB
-	andi r16, 0b01000000
-	cpi r16,  0b01000000
-	brne send
+w_cnfm_s:	
+	sbis PINB, 6
+	rjmp w_cnfm_s
 
 	sbi DDRB, 0
 	sbi DDRB, 1
@@ -82,39 +82,44 @@ send:
 	;; Write D inputs to B outputs
 	sbic PIND, 0
 	sbi PORTB, 0
+	sbis PIND, 0
+	cbi PORTB, 0
+	
 	sbic PIND, 1
 	sbi PORTB, 1
+	sbis PIND, 1
+	cbi PORTB, 1
+	
 	sbic PIND, 2
 	sbi PORTB, 2
+	sbis PIND, 2
+	cbi PORTB, 2
+
+	;; Done sending: values are on outputs
 	cbi PORTB, 3
 
-	;; Wait for PBb6 to be zero
-send2:	
-	in r16, PINB
-	andi r16, 0b01000000
-	brne send2
+	;; Wait for other machine to stop confirm: nums recorded
+w2_cnfm_c:	
+	sbic PINB, 6
+	rjmp w2_cnfm_c
 
+	;; Set B number bits back to inputs.
 	cbi DDRB, 0
 	cbi DDRB, 1
 	cbi DDRB, 2
 
-	ldi r16, 255
-	ldi r17, 199
-	ldi r18, 200
-delay:
-	dec r16
+	;; Indicate sending to sync with other machine.
+	sbi PORTB, 3
+
+	;; Short delay to ensure other machine can read set.
 	nop
-	brne delay
-
-	ldi r16, 255
-	dec r17
-	brne delay
-
-	ldi r17, 199
-	dec r18
-	brne delay
+	nop
+	nop
+	nop
+	nop
+	nop
 	
-	;; End wanting to send
+	;; End indicating sending.
 	cbi PORTB, 3
 	rjmp start
 .end
