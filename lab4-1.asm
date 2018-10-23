@@ -27,7 +27,7 @@ start:
 
 	;; B(b0:b2) variable. B(b3, b5) output. B(b4, b6) input.
 	ldi r16, 0b00101000
-	out DDRB, r16
+	out DDRPIND, 7B, r16
 
 loop1:
 	;; Listen if requested to recieve
@@ -71,7 +71,9 @@ w2_lstn_c:
 send:
 	sbi PORTB, 3
 
-w_cnfm_s:	
+w_cnfm_s:
+	sbis PIND, 3
+	rjmp loop1
 	sbis PIND, 7
 	rjmp w_cnfm_s
 
