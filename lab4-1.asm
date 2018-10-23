@@ -32,11 +32,11 @@ start:
 loop1:
 	;; Listen if requested to recieve
 	sbic PINB, 4
-	breq listen
+	rjmp listen
 
 	;; Send if D send bit is high
 	sbic PIND, 3
-	breq send
+	rjmp send
 	
 	rjmp loop1
 
@@ -45,7 +45,7 @@ listen:
 	sbi PORTB, 5
 w_lstn_c:	
 	sbic PINB, 4
-	breq w_lstn_c
+	rjmp w_lstn_c
 
 	in r16, PINB
 	andi r16, 0b00000111
