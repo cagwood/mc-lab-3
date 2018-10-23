@@ -27,7 +27,7 @@ start:
 
 	;; B(b0:b2) variable. B(b3, b5) output. B(b4, b6) input.
 	ldi r16, 0b00101000
-	out DDRPIND, 7B, r16
+	out DDRB, r16
 
 loop1:
 	;; Listen if requested to recieve
