@@ -1,8 +1,8 @@
 ;;; Pin configurations:
-;;; D:7|6 5 4|   3    |2 1 0 |
-;;;   x| LED |Send bit|Number|
-;;; B:7|     6      |     5      |    4    |   3   |2 1 0 |
-;;;   x|Recv Confirm|Send Confirm|RQ Listen|Sending|Number|
+;;; D:     7      |6 5 4|   3    |2 1 0 |
+;;;   Recv Confirm| LED |Send bit|Number|
+;;; B      5      |    4    |   3   |2 1 0 |
+;;;   Send Confirm|RQ Listen|Sending|Number|
 .global start
 .text
 	;; Port B: Communication (data and control)
@@ -72,7 +72,7 @@ send:
 	sbi PORTB, 3
 
 w_cnfm_s:	
-	sbis PINB, 6
+	sbis PIND, 7
 	rjmp w_cnfm_s
 
 	sbi DDRB, 0
@@ -100,7 +100,7 @@ w_cnfm_s:
 
 	;; Wait for other machine to stop confirm: nums recorded
 w2_cnfm_c:	
-	sbic PINB, 6
+	sbic PIND, 7
 	rjmp w2_cnfm_c
 
 	;; Set B number bits back to inputs.
