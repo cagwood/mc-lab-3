@@ -65,6 +65,19 @@ w2_lstn_c:
 	sbic PINB, 4
 	rjmp w2_lstn_c
 
+	;; Delay to ensure the sender gets a chance to enter send mode
+	;; again. Listener will continue to listen even with send set
+	;; until the first sender stops.
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+
 	rjmp start
 
 ;;; Send State
