@@ -71,9 +71,7 @@ w2_lstn_c:
 send:
 	sbi PORTB, 3
 
-w_cnfm_s:
-	sbis PIND, 3
-	rjmp loop1
+w_cnfm_s:	
 	sbis PIND, 7
 	rjmp w_cnfm_s
 
